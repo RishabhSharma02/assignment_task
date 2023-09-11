@@ -12,9 +12,11 @@ class FaceScreen extends StatelessWidget {
       children: [
         GestureDetector(
           onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return FingerprintScreen();
-            },));
+            Navigator.push(context, MaterialPageRoute(
+              builder: (context) {
+                return FingerprintScreen();
+              },
+            ));
           },
           child: Container(
             width: MediaQuery.of(context).size.width,
@@ -26,41 +28,44 @@ class FaceScreen extends StatelessWidget {
             top: MediaQuery.of(context).size.height * 0.65,
             child: Container(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 30),
-                  child: DefaultTextStyle(
-                      style: GoogleFonts.lato(
-                          color: Colors.black,
-                          fontSize: 24,
-                          fontWeight: FontWeight.w700),
-                      child: Text(ConstantString.str1)),
-                ),
-                Padding(
-                  padding:  EdgeInsets.only(top:MediaQuery.of(context).size.height*0.02),
-                  child: DefaultTextStyle(
-                      style: GoogleFonts.lato(
-                          color: Colors.black,
-                          fontSize: 14,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 30),
+                      child: DefaultTextStyle(
+                          style: GoogleFonts.lato(
+                              color: Colors.black,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700),
+                          child: Text(ConstantString.str1)),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(
+                          top: MediaQuery.of(context).size.height * 0.02),
+                      child: DefaultTextStyle(
+                          style: GoogleFonts.lato(
+                            color: Colors.black,
+                            fontSize: 14,
                           ),
-                      child: Text(ConstantString.str2)),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: MediaQuery.of(context).size.height*0.1),
-                  child: DefaultTextStyle(
-                      style: GoogleFonts.lato(
-                          color: Colors.black,
-                          fontSize: 14,
+                          child: Text(ConstantString.str2)),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(
+                          top: MediaQuery.of(context).size.height * 0.1),
+                      child: DefaultTextStyle(
+                          style: GoogleFonts.lato(
+                            color: Colors.black,
+                            fontSize: 14,
                           ),
-                      child: Text(ConstantString.str3)),
-                ),
-                Padding(
-                  padding:  EdgeInsets.only(top:MediaQuery.of(context).size.height*0.04),
-                  child: Image.asset("assets/progress_bar.png"),
-                )
-              ]),
+                          child: Text(ConstantString.str3)),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(
+                          top: MediaQuery.of(context).size.height * 0.04),
+                      child: Image.asset("assets/progress_bar.png"),
+                    )
+                  ]),
               decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
@@ -68,7 +73,18 @@ class FaceScreen extends StatelessWidget {
                       topRight: Radius.circular(20))),
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height * 0.5,
-            ))
+            )),
+        Positioned(
+            top: MediaQuery.of(context).size.height * 0.1,
+            left: MediaQuery.of(context).size.width * 0.1,
+            child: GestureDetector(onTap: (){
+              Navigator.push(context, MaterialPageRoute(
+              builder: (context) {
+                return FingerprintScreen();
+              },
+            ));
+
+            },child: Image.asset("assets/face_border.png")))
       ],
     );
   }
