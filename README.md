@@ -15,7 +15,7 @@ Welcome to the UI assignment task! In this project, you will find a user-friendl
 
 ## Features of the Project:
 
-This project is thoughtfully structured with several key features:
+This project is thoughtfully structured and is responsive with several key features:
 
 ### 1. MVC Architecture:
 
