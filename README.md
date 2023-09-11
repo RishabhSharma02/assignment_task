@@ -1,16 +1,16 @@
-# assign_task
+# Assignment Task
 
-A new Flutter project.
+UI assignment task.
 
-## Getting Started
+## Navigation of Screens:
 
-This project is a starting point for a Flutter application.
+The start of the assignment project is the Face Scan Screen, Tap on the face to move to the next screen i.e. Fingerprint screen, tap on the fingerprint to move to the next screen, and afterwards followed by Next button navigations.
 
-A few resources to get you started if this is your first Flutter project:
+## Features of Project :
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+->This project follows the MVC architecture and screen files are contained in the views section.
+->Constants used in the project are inside the project's constant directory.
+->The Utils section contains the common widgets used in the project.
+->Minimum use of Sized box and adherance to S.O.L.I.D principles and CLEAN architecture.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
