@@ -43,7 +43,7 @@ class CustomButton extends StatelessWidget {
       width: MediaQuery.of(context).size.width*0.9,
       child: ElevatedButton(
          style: ElevatedButton.styleFrom(
-      backgroundColor: ColorConstants.buttonClr
+      backgroundColor: ConstantColors.buttonClr
       ),
         onPressed: callback,
         child: Text(
@@ -64,7 +64,7 @@ class CategoryWidget extends StatelessWidget {
       child: Center(child: Text(text,style: GoogleFonts.lato(fontSize: 14),)),
       width: 120,
       height: 55,
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(30),color: ColorConstants.textFieldClr),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(30),color: ConstantColors.textFieldClr),
     );
   }
 }

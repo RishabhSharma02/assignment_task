@@ -1,4 +1,5 @@
-import 'package:assign_task/constants/Constants.dart';
+import 'package:assign_task/constants/ConstantStrings.dart';
+
 import 'package:assign_task/utils/Common_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
