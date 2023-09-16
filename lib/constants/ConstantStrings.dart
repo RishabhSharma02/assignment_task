@@ -17,4 +17,8 @@ class ConstantString {
   static const str15 = "Teacher";
   static const str16 = "Parent";
   static const str17 = "Submit";
+  static const str18 = "Learn everything with AI";
+  static const str19 =
+      "learn and grow with ai to stay up to date, with ever evolving demand of ai in the future";
+  static const str20 = "Get Started";
 }
