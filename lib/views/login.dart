@@ -1,7 +1,8 @@
 import 'package:assign_task/constants/ConstantStrings.dart';
 import 'package:assign_task/utils/Common_widgets.dart';
 import 'package:assign_task/views/face_screen.dart';
-import 'package:assign_task/views/fingerprint_screen.dart';
+import 'package:assign_task/views/fill_password.dart';
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
 import 'dart:ui' as ui;
@@ -84,10 +85,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 padding: const EdgeInsets.all(8.0),
                 child: Center(
                     child: CustomButton(
-                        callback: () {
+                        callback: () async{
+                          late List<CameraDescription> _cameras;
+                          _cameras = await availableCameras();
                           Navigator.push(context, MaterialPageRoute(
                             builder: (context) {
-                              return const FaceScreen();
+                              return FaceScreen(cameras: _cameras,);
                             },
                           ));
                         },

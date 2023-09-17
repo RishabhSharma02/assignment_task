@@ -3,8 +3,10 @@ import 'package:assign_task/views/login.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
+import 'package:get/get_navigation/src/root/get_material_app.dart';
+
 void main() {
-  runApp(const MaterialApp(
+  runApp(const GetMaterialApp(
     debugShowCheckedModeBanner: false,
     home: MyApp(),
   ));
