@@ -23,7 +23,7 @@ app = Flask(__name__)
 app.config['MONGO_URI'] = os.getenv('MONGO_URI', 'mongodb://localhost:27017/pranjal')
 
 # Initializing MongoDB
-mongo = PyMongo(app) 
+mongo = PyMongo(app)
 
 @app.route('/')
 def home():
@@ -125,59 +125,69 @@ def hash_data(data):
     """Returns a SHA-256 hash of the given data."""
     return hashlib.sha256(data).hexdigest()
 
+def encode_images_to_base64(images):
+    """Encode a list of images to a list of base64 strings."""
+    base64_strings = []
+    for image in images:
+        _, buffer = cv2.imencode('.jpg', image)
+        jpg_as_text = base64.b64encode(buffer).decode('utf-8')
+        base64_strings.append(jpg_as_text)
+    return base64_strings
 
-def frame_to_base64(frame):
-    retval, buffer = cv2.imencode('.jpg', frame)
-    jpg_as_text = base64.b64encode(buffer)
-    return jpg_as_text.decode()
 
-
-
-def capture_face(prompt_message=""):
-    # If you have a prompt message, show it here (like "Look left").
+def capture_faces(num_frames=5, prompt_message=""):
+    """Capture and return multiple face images."""
     if prompt_message:
         print(prompt_message)
 
     camera = cv2.VideoCapture(0)
+    captured_frames = []
+
     try:
         if not camera.isOpened():
             raise ValueError("Could not open video device")
 
-        ret, frame = camera.read()
-        if not ret:
-            raise ValueError("Could not capture frame")
+        for _ in range(num_frames):
+            ret, frame = camera.read()
+            if not ret:
+                continue
 
-        # Anti-Spoofing: Texture Analysis
-        if not texture_analysis_lbp(frame):
-            raise ValueError("Potential spoof detected based on texture!")
+            # Anti-Spoofing: Texture Analysis
+            if not texture_analysis_lbp(frame):
+                raise ValueError("Potential spoof detected based on texture!")
 
-        # Anti-Spoofing: Noise Analysis
-        if not noise_analysis(frame):
-            raise ValueError("Potential spoof detected based on screen noise!")
+            # Anti-Spoofing: Noise Analysis
+            if not noise_analysis(frame):
+                raise ValueError("Potential spoof detected based on screen noise!")
 
-        # Anti-Spoofing: Blink Detection
-        if prompt_message == "Look straight" and not detect_blink():  
-            raise ValueError("No blink detected, potential spoof!")
+            captured_frames.append(frame)
 
-        # Anti-Spoofing: Motion Analysis
-        if prompt_message == "Look straight" and not motion_analysis():
-            raise ValueError("No motion detected, potential spoof!")
+        # Only perform blink and motion analysis on the last frame for now
+        last_frame = captured_frames[-1]
+        if prompt_message == "Look straight":
+            if not detect_blink():
+                raise ValueError("No blink detected, potential spoof!")
+            if not motion_analysis():
+                raise ValueError("No motion detected, potential spoof!")
 
-        rgb_frame = frame[:, :, ::-1]
-        face_encodings = face_recognition.face_encodings(rgb_frame)
+        rgb_last_frame = last_frame[:, :, ::-1]
+        face_encodings = face_recognition.face_encodings(rgb_last_frame)
         
-        # Store hash of face encoding instead of raw data
-        if face_encodings:
-           hashed_encoding = [hash_data(encoding.tobytes()) for encoding in face_encodings]
-           encoded_frame = frame_to_base64(frame)
+        encoded_images = encode_images_to_base64(captured_frames)
 
-           return hashed_encoding[0], encoded_frame
+        if face_encodings:
+            hashed_encoding = [hash_data(encoding.tobytes()) for encoding in face_encodings]
+            return hashed_encoding[0], encoded_images
+        return None, encoded_images
+
     except Exception as e:
-        logging.error(f"Error in capturing face: {e}")
-        raise HTTPException(description="Error in capturing face!", code=500)
+        logging.error(f"Error in capturing faces: {e}")
+        raise HTTPException(description="Error in capturing faces!", code=500)
+
     finally:
         camera.release()
         cv2.destroyAllWindows()
+
 
 
 #def capture_fingerprint():
@@ -203,14 +213,11 @@ def capture_face(prompt_message=""):
 
 def capture_multiple_faces_encodings():
     encodings = []
-    frames_base64 = []
     for prompt in ["Look straight", "Look left", "Look right", "Look up", "Look down"]:
-        encoding, frame_base64 = capture_face(prompt)
+        encoding, encoded_frame = capture_faces(prompt)
         if encoding:
             encodings.append(encoding.tolist())
-            frames_base64.append(frame_base64)
-    # Choose a logic to return one frame or combine all if needed
-    return encodings, frames_base64[0]  # Here, I'm returning the first frame for simplicity
+    return encodings, encoded_frame
 
 
 #def capture_multiple_fingerprints():
@@ -267,32 +274,36 @@ def validate_password(password):
 
 @app.route('/signup', methods=['POST'])
 def signup():
-    face_encodings, frame_base64 = capture_multiple_faces_encodings()
-    if not face_encodings:
-        raise HTTPException(description="Face encodings failed. Try again.", code=400)
+    try:
+        face_encodings, encoded_frame = capture_multiple_faces_encodings()
+        
+        if not face_encodings:
+            return jsonify(success=False, message='Faces not recognized during all prompts', frame=encoded_frame), 400
 
-    # Hash the provided password
-    password = request.json.get("password")
-    
-    
-    # Validate password before proceeding
-    if not validate_password(password):
-        raise HTTPException(description="Password does not meet requirements.", code=400)
+        # Hash the provided password
+        password = request.json.get("password")
+        
+        # Validate password before proceeding
+        if not validate_password(password):
+            raise HTTPException(description="Password does not meet requirements.", code=400)
 
-    hashed_password = generate_password_hash(password)
+        hashed_password = generate_password_hash(password)
 
-    # Using the uuid as a temporary token for the frontend to use
-    temp_token = uuid.uuid4().hex
+        # Using the uuid as a temporary token for the frontend to use
+        temp_token = uuid.uuid4().hex
 
-    # Storing the encodings with the temporary token
-    temp_user = {
-        "_id": temp_token,
-        "password": hashed_password,  # Storing the hashed password
-        "face_encodings": face_encodings
-    }
-    mongo.db.temp_users.insert_one(temp_user)
+        # Storing the encodings with the temporary token
+        temp_user = {
+            "_id": temp_token,
+            "password": hashed_password,  # Storing the hashed password
+            "face_encodings": face_encodings
+        }
+        mongo.db.temp_users.insert_one(temp_user)
 
-    return jsonify(success=True, frame=frame_base64, temp_token=temp_token, message='Face and password captured successfully!'), 200
+        return jsonify(success=True, temp_token=temp_token, message='Face and password captured successfully!'), 200
+
+    except Exception as e:
+        return jsonify(success=False, message=str(e)), 500
 
 
 @app.route('/complete_signup', methods=['POST'])
@@ -328,28 +339,31 @@ def complete_signup():
 
 @app.route('/login', methods=['POST'])
 def login():
-    captured_face_encoding, frame_base64 = capture_face()
-    if captured_face_encoding is None:
-        raise HTTPException(description="No face detected, please try again!", code=400)
+    try:
+        captured_face_encoding, encoded_frame = capture_faces()
+        if captured_face_encoding is None:
+            return jsonify(success=False, message='Face not recognized', frame=encoded_frame), 400
 
-    users_data = list(mongo.db.users.find({}))
-    if not users_data:
-        raise HTTPException(description="No users in the database!", code=400)
+        users_data = list(mongo.db.users.find({}))
+        if not users_data:
+            raise HTTPException(description="No users in the database!", code=400)
 
-    password = request.json.get("password")
-    recognized_user = None
-    for user_data in users_data:
-        recognized_encodings = [face_recognition.compare_faces([stored], captured_face_encoding) for stored in user_data['face_encodings']]
-        if sum(recognized_encodings) > 2:  # A majority vote mechanism
-            if check_password_hash(user_data['password'], password):
-                recognized_user = user_data
-                break
+        password = request.json.get("password")
+        recognized_user = None
+        for user_data in users_data:
+            recognized_encodings = [face_recognition.compare_faces([stored], captured_face_encoding) for stored in user_data['face_encodings']]
+            if sum(recognized_encodings) > 2:  # A majority vote mechanism
+                if check_password_hash(user_data['password'], password):
+                    recognized_user = user_data
+                    break
 
-    if recognized_user:
-        return jsonify(success=True, frame=frame_base64, message='Face and password recognized!', user_id=recognized_user['_id']), 200
-    else:
-        raise HTTPException(description="Face not recognized or incorrect password!", code=400)
+        if recognized_user:
+            return jsonify(success=True, message='Face and password recognized!', user_id=recognized_user['_id']), 200
+        else:
+            return jsonify(success=False, message='Face recognized but credentials incorrect', frame=encoded_frame), 401
 
+    except Exception as e:
+        return jsonify(success=False, message=str(e)), 500
 
 
 if __name__ == "__main__":

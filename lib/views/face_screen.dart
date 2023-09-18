@@ -24,7 +24,6 @@ class FaceScreen extends StatefulWidget {
 
 class _FaceScreenState extends State<FaceScreen> {
   Routes routeController=Get.put(Routes());
-  late XFile? capturedImage; 
   int progressval = 0;
   late CameraController controller;
   void initState() {
@@ -47,10 +46,12 @@ class _FaceScreenState extends State<FaceScreen> {
         }
       }
     });
-      Timer.periodic(Duration(seconds: 5), (Timer timer) {
+      Timer.periodic(Duration(seconds: 5), (Timer timer) async{
         
-        captureImage();
+        var Capimg=await captureImage();
+       
         print("=============>CAPTURED");
+         routeController.signUp(Capimg!);
         setState(() {
            progressval+=20;
         });
@@ -144,10 +145,10 @@ class _FaceScreenState extends State<FaceScreen> {
   }
   captureImage() async{
    final XFile? image = await controller.takePicture();
-      capturedImage = image;
-      Fluttertoast.showToast(msg: "Frame captured");
-      print(capturedImage!.path.toString());
    
+      Fluttertoast.showToast(msg: "Frame captured");
+      print(image!.path.toString());
+      return image;
 }
 }
 class BuildInstructionText extends StatelessWidget {
