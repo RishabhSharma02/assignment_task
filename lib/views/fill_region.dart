@@ -48,6 +48,7 @@ class _FillRegionState extends State<FillRegion> {
                   top: MediaQuery.of(context).size.height * 0.03),
               child: Center(
                   child: CommonTextfield(
+                    type: "Normal",
                 Text: ConstantString.str8,
                 inputcontroller: regionControler,
               )),

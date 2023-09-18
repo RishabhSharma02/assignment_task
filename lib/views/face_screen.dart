@@ -54,7 +54,7 @@ class _FaceScreenState extends State<FaceScreen> {
         setState(() {
            progressval+=20;
         });
-        //routeController.signUp();
+        //routeController.signUp(capturedImage!);
         if(progressval==100){
           timer.cancel();
           Navigator.push(context, MaterialPageRoute(

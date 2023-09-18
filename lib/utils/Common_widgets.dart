@@ -4,9 +4,10 @@ import 'package:google_fonts/google_fonts.dart';
 
 class CommonTextfield extends StatelessWidget {
   final String Text;
+  final String type;
   final TextEditingController inputcontroller;
   const CommonTextfield(
-      {super.key, required this.Text, required this.inputcontroller});
+      {super.key, required this.Text, required this.inputcontroller, required this.type});
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +18,7 @@ class CommonTextfield extends StatelessWidget {
       width: MediaQuery.of(context).size.width * 0.9,
       height: 65,
       child: TextField(
+        obscureText: type=="pwd"?true:false,
         controller: inputcontroller,
         decoration: InputDecoration(
             hintText: Text,

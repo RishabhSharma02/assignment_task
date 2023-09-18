@@ -45,6 +45,7 @@ class _FillNameState extends State<FillName> {
                 padding: EdgeInsets.only(top: MediaQuery.of(context).size.height*0.03),
                 child: Center(
                     child: CommonTextfield(
+                      type: "normal",
                   Text: ConstantString.str5,
                   inputcontroller: nameController,
                 )),

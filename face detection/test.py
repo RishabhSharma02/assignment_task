@@ -12,6 +12,7 @@ from skimage.feature import local_binary_pattern
 import numpy as np
 import hashlib
 import re
+import base64
 
 
 logging.basicConfig(level=logging.INFO)
@@ -22,7 +23,7 @@ app = Flask(__name__)
 app.config['MONGO_URI'] = os.getenv('MONGO_URI', 'mongodb://localhost:27017/pranjal')
 
 # Initializing MongoDB
-mongo = PyMongo(app)
+mongo = PyMongo(app) 
 
 @app.route('/')
 def home():
@@ -124,6 +125,14 @@ def hash_data(data):
     """Returns a SHA-256 hash of the given data."""
     return hashlib.sha256(data).hexdigest()
 
+
+def frame_to_base64(frame):
+    retval, buffer = cv2.imencode('.jpg', frame)
+    jpg_as_text = base64.b64encode(buffer)
+    return jpg_as_text.decode()
+
+
+
 def capture_face(prompt_message=""):
     # If you have a prompt message, show it here (like "Look left").
     if prompt_message:
@@ -160,7 +169,9 @@ def capture_face(prompt_message=""):
         # Store hash of face encoding instead of raw data
         if face_encodings:
            hashed_encoding = [hash_data(encoding.tobytes()) for encoding in face_encodings]
-           return hashed_encoding[0]
+           encoded_frame = frame_to_base64(frame)
+
+           return hashed_encoding[0], encoded_frame
     except Exception as e:
         logging.error(f"Error in capturing face: {e}")
         raise HTTPException(description="Error in capturing face!", code=500)
@@ -192,11 +203,15 @@ def capture_face(prompt_message=""):
 
 def capture_multiple_faces_encodings():
     encodings = []
+    frames_base64 = []
     for prompt in ["Look straight", "Look left", "Look right", "Look up", "Look down"]:
-        encoding = capture_face(prompt)
+        encoding, frame_base64 = capture_face(prompt)
         if encoding:
             encodings.append(encoding.tolist())
-    return encodings
+            frames_base64.append(frame_base64)
+    # Choose a logic to return one frame or combine all if needed
+    return encodings, frames_base64[0]  # Here, I'm returning the first frame for simplicity
+
 
 #def capture_multiple_fingerprints():
 #    fingerprints = []
@@ -252,7 +267,7 @@ def validate_password(password):
 
 @app.route('/signup', methods=['POST'])
 def signup():
-    face_encodings = capture_multiple_faces_encodings()
+    face_encodings, frame_base64 = capture_multiple_faces_encodings()
     if not face_encodings:
         raise HTTPException(description="Face encodings failed. Try again.", code=400)
 
@@ -277,7 +292,7 @@ def signup():
     }
     mongo.db.temp_users.insert_one(temp_user)
 
-    return jsonify(success=True, temp_token=temp_token, message='Face and password captured successfully!'), 200
+    return jsonify(success=True, frame=frame_base64, temp_token=temp_token, message='Face and password captured successfully!'), 200
 
 
 @app.route('/complete_signup', methods=['POST'])
@@ -313,7 +328,7 @@ def complete_signup():
 
 @app.route('/login', methods=['POST'])
 def login():
-    captured_face_encoding = capture_face()
+    captured_face_encoding, frame_base64 = capture_face()
     if captured_face_encoding is None:
         raise HTTPException(description="No face detected, please try again!", code=400)
 
@@ -331,9 +346,10 @@ def login():
                 break
 
     if recognized_user:
-        return jsonify(success=True, message='Face and password recognized!', user_id=recognized_user['_id']), 200
+        return jsonify(success=True, frame=frame_base64, message='Face and password recognized!', user_id=recognized_user['_id']), 200
     else:
         raise HTTPException(description="Face not recognized or incorrect password!", code=400)
+
 
 
 if __name__ == "__main__":

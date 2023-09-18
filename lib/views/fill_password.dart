@@ -43,6 +43,7 @@ class _FingerprintScreenState extends State<FingerprintScreen> {
                 padding: EdgeInsets.only(top: MediaQuery.of(context).size.height*0.05),
                 child: Center(
                     child: CommonTextfield(
+                      type: "pwd",
                   Text: "Enter your password", inputcontroller: nameController,
                   //inputcontroller: nameController,
                 )),
