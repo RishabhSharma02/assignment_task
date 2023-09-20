@@ -1,20 +1,20 @@
 import 'package:assign_task/constants/ConstantStrings.dart';
 import 'package:assign_task/utils/Common_widgets.dart';
+import 'package:assign_task/utils/client.dart';
 import 'package:assign_task/views/choose_profile.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
+import 'package:get/instance_manager.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class FillRegion extends StatefulWidget {
-  final String name;
-  final String pwd;
-  const FillRegion({super.key, required this.name, required this.pwd});
+class FillRegion extends StatelessWidget {
+  FillRegion({super.key});
 
-  @override
-  State<FillRegion> createState() => _FillRegionState();
-}
+  ProfileController profileController=Get.put(ProfileController());
 
-class _FillRegionState extends State<FillRegion> {
   TextEditingController regionControler = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,7 +37,7 @@ class _FillRegionState extends State<FillRegion> {
                 left: 30,
               ),
               child: Text(
-                "Welcome ${widget.name},\nWhat is your region?",
+                "Welcome ${profileController.name.value},\nWhat is your region?",
                 textAlign: TextAlign.left,
                 style: GoogleFonts.lato(
                     color: Color(0xff9163D7),
@@ -61,15 +61,13 @@ class _FillRegionState extends State<FillRegion> {
               child: Center(
                   child: CustomButton(
                       callback: () {
-                        Navigator.push(context, MaterialPageRoute(
-                          builder: (context) {
-                            return ChooseProfile(
-                              name: widget.name,
-                              pwd: widget.pwd,
-                              region: regionControler.text,
-                            );
-                          },
-                        ));
+                          if (!regionControler.text.isEmpty) {
+                        profileController.region.value=regionControler.text;
+                         Get.to(()=>ChooseProfile(),transition: Transition.fadeIn);
+                          }
+                          else{
+                            Fluttertoast.showToast(msg: "Region can't be empty");
+                          }
                       },
                       text: ConstantString.str6)),
             )

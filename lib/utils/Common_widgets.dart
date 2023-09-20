@@ -7,7 +7,10 @@ class CommonTextfield extends StatelessWidget {
   final String type;
   final TextEditingController inputcontroller;
   const CommonTextfield(
-      {super.key, required this.Text, required this.inputcontroller, required this.type});
+      {super.key,
+      required this.Text,
+      required this.inputcontroller,
+      required this.type});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +21,7 @@ class CommonTextfield extends StatelessWidget {
       width: MediaQuery.of(context).size.width * 0.9,
       height: 65,
       child: TextField(
-        obscureText: type=="pwd"?true:false,
+        obscureText: type == "pwd" ? true : false,
         controller: inputcontroller,
         decoration: InputDecoration(
             hintText: Text,
@@ -41,36 +44,51 @@ class CustomButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 50,
-      width: MediaQuery.of(context).size.width*0.9,
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
+      height: 60,
+      width: MediaQuery.of(context).size.width * 0.9,
       child: ElevatedButton(
-         style: ElevatedButton.styleFrom(
-      backgroundColor: ConstantColors.buttonClr
-      ),
+        style: ButtonStyle(
+            backgroundColor:
+                MaterialStateProperty.all<Color>(ConstantColors.buttonClr),
+            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30.0),
+            ))),
         onPressed: callback,
         child: Text(
           text,
-          style: GoogleFonts.lato(fontSize: 14,color: Colors.white),
+          style: GoogleFonts.lato(fontSize: 18, color: Colors.white),
         ),
       ),
     );
   }
 }
+
 class CategoryWidget extends StatelessWidget {
   final Color selectedCol;
   final VoidCallback callback;
   final String text;
-  const CategoryWidget({super.key, required this.text, required this.callback, required this.selectedCol});
+  const CategoryWidget(
+      {super.key,
+      required this.text,
+      required this.callback,
+      required this.selectedCol});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap:callback,
+      onTap: callback,
       child: Container(
-        child: Center(child: Text(text,style: GoogleFonts.lato(fontSize: 14),)),
+        child: Center(
+            child: Text(
+          text,
+          style: GoogleFonts.lato(fontSize: 14),
+        )),
         width: 120,
         height: 55,
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(30),color: selectedCol),
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30), color: selectedCol),
       ),
     );
   }

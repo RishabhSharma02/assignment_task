@@ -1,5 +1,5 @@
-import 'package:assign_task/views/face_screen.dart';
-import 'package:assign_task/views/login.dart';
+import 'package:assign_task/views/fill_name.dart';
+import 'package:assign_task/views/admin_user.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -29,7 +29,7 @@ class _MyAppState extends State<MyApp> {
         const Duration(seconds: 3),
         () => Navigator.push(context, MaterialPageRoute(
               builder: (context) {
-                return const LoginScreen();
+                return  RoleScreen();
               },
             )));
   }

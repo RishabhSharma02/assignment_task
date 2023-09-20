@@ -1,26 +1,25 @@
 import 'package:assign_task/constants/ConstantStrings.dart';
 import 'package:assign_task/utils/Common_widgets.dart';
 import 'package:assign_task/utils/client.dart';
-import 'package:assign_task/views/face_screen.dart';
-import 'package:assign_task/views/fill_password.dart';
-import 'package:assign_task/views/login_face_screen.dart';
-import 'package:camera/camera.dart';
+
+import 'package:assign_task/views/signup_or_login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
+import 'package:get/get.dart';
 import 'dart:ui' as ui;
 
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/get_instance.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RoleScreen extends StatefulWidget {
+  const RoleScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RoleScreen> createState() => _RoleScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-   Routes routeController=Get.put(Routes());
+class _RoleScreenState extends State<RoleScreen> {
+   ProfileController routeController=Get.put(ProfileController());
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -92,14 +91,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Center(
                     child: CustomButton(
                         callback: () async{
-                          // routeController.sendPostRequest();
-                          late List<CameraDescription> _cameras;
-                          _cameras = await availableCameras();
-                          Navigator.push(context, MaterialPageRoute(
-                            builder: (context) {
-                              return FaceScreen(cameras: _cameras,);
-                            },
-                          ));
+                        
+                           Get.to(()=>Login_or_Signup(),transition: Transition.fadeIn);
                         },
                         text: ConstantString.str20)),
               ),
@@ -110,13 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Center(
                     child: CustomButton(
                         callback: () async{
-                          late List<CameraDescription> _cameras;
-                          _cameras = await availableCameras();
-                          Navigator.push(context, MaterialPageRoute(
-                            builder: (context) {
-                              return LoginFaceScreen(cameras: _cameras,);
-                            },
-                          ));
+                        
                         },
                         text: ConstantString.str6)))
           ],
