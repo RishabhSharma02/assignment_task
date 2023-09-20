@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class FillName extends StatefulWidget {
-  const FillName({super.key});
+  final String pwd;
+  const FillName({super.key, required this.pwd});
 
   @override
   State<FillName> createState() => _FillNameState();
@@ -55,7 +56,7 @@ class _FillNameState extends State<FillName> {
                 child: Center(child: CustomButton(callback: () {
                    Navigator.push(context, MaterialPageRoute(
                       builder: (context) {
-                        return FillRegion();
+                        return FillRegion(name: nameController.text,pwd: widget.pwd,);
                       },
                     ));
                 }, text: ConstantString.str6)),

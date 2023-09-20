@@ -57,16 +57,21 @@ class CustomButton extends StatelessWidget {
   }
 }
 class CategoryWidget extends StatelessWidget {
+  final Color selectedCol;
+  final VoidCallback callback;
   final String text;
-  const CategoryWidget({super.key, required this.text});
+  const CategoryWidget({super.key, required this.text, required this.callback, required this.selectedCol});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Center(child: Text(text,style: GoogleFonts.lato(fontSize: 14),)),
-      width: 120,
-      height: 55,
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(30),color: ConstantColors.textFieldClr),
+    return InkWell(
+      onTap:callback,
+      child: Container(
+        child: Center(child: Text(text,style: GoogleFonts.lato(fontSize: 14),)),
+        width: 120,
+        height: 55,
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(30),color: selectedCol),
+      ),
     );
   }
 }

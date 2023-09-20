@@ -4,6 +4,7 @@ import 'package:assign_task/constants/ConstantColors.dart';
 import 'package:assign_task/constants/ConstantStrings.dart';
 import 'package:assign_task/utils/client.dart';
 import 'package:assign_task/views/fill_password.dart';
+import 'package:assign_task/views/login.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animation_progress_bar/flutter_animation_progress_bar.dart';
@@ -23,8 +24,9 @@ class FaceScreen extends StatefulWidget {
 }
 
 class _FaceScreenState extends State<FaceScreen> {
-  Routes routeController=Get.put(Routes());
+  Routes routeController = Get.put(Routes());
   int progressval = 0;
+  int errorval = 0;
   late CameraController controller;
   void initState() {
     super.initState();
@@ -36,37 +38,42 @@ class _FaceScreenState extends State<FaceScreen> {
       setState(() {});
     }).catchError((Object e) {
       if (e is CameraException) {
-        switch (e.code) {
-          case 'CameraAccessDenied':
-            // Handle access errors here.
-            break;
-          default:
-            // Handle other errors here.
-            break;
+        Fluttertoast.showToast(msg: e.toString());
+      }
+    });
+    Timer.periodic(Duration(seconds: 5), (Timer timer) async {
+      if(errorval<3){
+      var Capimg = await captureImage();
+      print("=============>CAPTURED");
+      var res = await routeController.faceDetect(Capimg);
+      if (res == "Success") {
+        setState(() {
+          Fluttertoast.showToast(msg: "Success");
+          progressval += 20;
+        });
+      } else {
+        Fluttertoast.showToast(msg: res);
+        errorval += 1;
+      }
+      }
+      if (progressval == 100) {
+        timer.cancel();
+        Navigator.pushReplacement(context, MaterialPageRoute(
+          builder: (context) {
+            return FingerprintScreen();
+          },
+        ));
+      } else if (errorval == 3) {
+        if (this.mounted) {
+        Fluttertoast.showToast(msg: "Retry face registration");
+        Navigator.pushReplacement(context, MaterialPageRoute(
+          builder: (context) {
+            return LoginScreen();
+          },
+        ));
         }
       }
     });
-      Timer.periodic(Duration(seconds: 5), (Timer timer) async{
-        
-        var Capimg=await captureImage();
-       
-        print("=============>CAPTURED");
-         routeController.signUp(Capimg!);
-        setState(() {
-           progressval+=20;
-        });
-        //routeController.signUp(capturedImage!);
-        if(progressval==100){
-          timer.cancel();
-          Navigator.push(context, MaterialPageRoute(
-                    builder: (context) {
-                      return FingerprintScreen();
-                    },
-                  ));
-        }
-    
-  });
-  
   }
 
   @override
@@ -77,7 +84,6 @@ class _FaceScreenState extends State<FaceScreen> {
 
   @override
   Widget build(BuildContext context) {
-  
     return Stack(
       children: [
         CameraPreview(controller),
@@ -103,12 +109,11 @@ class _FaceScreenState extends State<FaceScreen> {
                       padding: EdgeInsets.only(
                           top: MediaQuery.of(context).size.height * 0.1),
                       child: DefaultTextStyle(
-                        
                           style: GoogleFonts.lato(
                             color: Colors.black,
                             fontSize: 14,
                           ),
-                          child: Text(progressval.toString()+" %")),
+                          child: Text(progressval.toString() + " %")),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -143,99 +148,95 @@ class _FaceScreenState extends State<FaceScreen> {
       ],
     );
   }
-  captureImage() async{
-   final XFile? image = await controller.takePicture();
-   
-      Fluttertoast.showToast(msg: "Frame captured");
-      print(image!.path.toString());
-      return image;
+
+  captureImage() async {
+    final XFile? image = await controller.takePicture();
+    Fluttertoast.showToast(msg: "Frame captured");
+    print(image!.path.toString());
+    return image;
+  }
 }
-}
+
 class BuildInstructionText extends StatelessWidget {
   final int progressval;
   const BuildInstructionText({super.key, required this.progressval});
 
   @override
   Widget build(BuildContext context) {
-    switch(progressval){
+    switch (progressval) {
       case 0:
-            return Padding(
-                      padding: EdgeInsets.only(
-                          top: MediaQuery.of(context).size.height * 0.02),
-                      child: DefaultTextStyle(
-                        
-                          style: GoogleFonts.lato(
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black,
-                            fontSize: 24,
-                          ),
-                          child: Text("Look Left")),
-                    );
+        return Padding(
+          padding:
+              EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.02),
+          child: DefaultTextStyle(
+              style: GoogleFonts.lato(
+                fontWeight: FontWeight.w700,
+                color: Colors.black,
+                fontSize: 24,
+              ),
+              child: Text("Look Left")),
+        );
       case 20:
-      return Padding(
-                      padding: EdgeInsets.only(
-                          top: MediaQuery.of(context).size.height * 0.02),
-                      child: DefaultTextStyle(
-                          style: GoogleFonts.lato(
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black,
-                            fontSize: 24,
-                          ),
-                          child: Text("Look Center")),
-                    );
+        return Padding(
+          padding:
+              EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.02),
+          child: DefaultTextStyle(
+              style: GoogleFonts.lato(
+                fontWeight: FontWeight.w700,
+                color: Colors.black,
+                fontSize: 24,
+              ),
+              child: Text("Look Center")),
+        );
       case 40:
-               return Padding(
-                      padding: EdgeInsets.only(
-                          top: MediaQuery.of(context).size.height * 0.02),
-                      child: DefaultTextStyle(
-                          style: GoogleFonts.lato(
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black,
-                            fontSize: 24,
-                          ),
-                          child: Text("Look Right")),
-                    );
+        return Padding(
+          padding:
+              EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.02),
+          child: DefaultTextStyle(
+              style: GoogleFonts.lato(
+                fontWeight: FontWeight.w700,
+                color: Colors.black,
+                fontSize: 24,
+              ),
+              child: Text("Look Right")),
+        );
 
-
-                    case 60:
-               return Padding(
-                      padding: EdgeInsets.only(
-                          top: MediaQuery.of(context).size.height * 0.02),
-                      child: DefaultTextStyle(
-                          style: GoogleFonts.lato(
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black,
-                            fontSize: 24,
-                          ),
-                          child: Text("Face Up")),
-                    );
-                    case 80:
-               return Padding(
-                      padding: EdgeInsets.only(
-                          top: MediaQuery.of(context).size.height * 0.02),
-                      child: DefaultTextStyle(
-                          style: GoogleFonts.lato(
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black,
-                            fontSize: 24,
-                          ),
-                          child: Text("Face Down")),
-                    );
+      case 60:
+        return Padding(
+          padding:
+              EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.02),
+          child: DefaultTextStyle(
+              style: GoogleFonts.lato(
+                fontWeight: FontWeight.w700,
+                color: Colors.black,
+                fontSize: 24,
+              ),
+              child: Text("Face Up")),
+        );
+      case 80:
+        return Padding(
+          padding:
+              EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.02),
+          child: DefaultTextStyle(
+              style: GoogleFonts.lato(
+                fontWeight: FontWeight.w700,
+                color: Colors.black,
+                fontSize: 24,
+              ),
+              child: Text("Face Down")),
+        );
       default:
-                     return Padding(
-                      padding: EdgeInsets.only(
-                          top: MediaQuery.of(context).size.height * 0.02),
-                      child: DefaultTextStyle(
-                          style: GoogleFonts.lato(
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black,
-                            fontSize: 24,
-                          ),
-                          child: Text("Completed !")),
-                    );
-
+        return Padding(
+          padding:
+              EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.02),
+          child: DefaultTextStyle(
+              style: GoogleFonts.lato(
+                fontWeight: FontWeight.w700,
+                color: Colors.black,
+                fontSize: 24,
+              ),
+              child: Text("Completed !")),
+        );
     }
-    
   }
-  
 }

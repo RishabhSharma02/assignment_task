@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class FillRegion extends StatefulWidget {
-  const FillRegion({super.key});
+  final String name;
+  final String pwd;
+  const FillRegion({super.key, required this.name, required this.pwd});
 
   @override
   State<FillRegion> createState() => _FillRegionState();
@@ -35,7 +37,7 @@ class _FillRegionState extends State<FillRegion> {
                 left: 30,
               ),
               child: Text(
-               ConstantString.str7,
+                "Welcome ${widget.name},\nWhat is your region?",
                 textAlign: TextAlign.left,
                 style: GoogleFonts.lato(
                     color: Color(0xff9163D7),
@@ -48,7 +50,7 @@ class _FillRegionState extends State<FillRegion> {
                   top: MediaQuery.of(context).size.height * 0.03),
               child: Center(
                   child: CommonTextfield(
-                    type: "Normal",
+                type: "Normal",
                 Text: ConstantString.str8,
                 inputcontroller: regionControler,
               )),
@@ -61,7 +63,11 @@ class _FillRegionState extends State<FillRegion> {
                       callback: () {
                         Navigator.push(context, MaterialPageRoute(
                           builder: (context) {
-                            return ChooseProfile();
+                            return ChooseProfile(
+                              name: widget.name,
+                              pwd: widget.pwd,
+                              region: regionControler.text,
+                            );
                           },
                         ));
                       },

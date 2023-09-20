@@ -1,5 +1,11 @@
+import 'package:assign_task/constants/ConstantStrings.dart';
 import 'package:assign_task/utils/Common_widgets.dart';
+import 'package:assign_task/utils/client.dart';
+import 'package:assign_task/views/fill_name.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/instance_manager.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class FingerprintScreen extends StatefulWidget {
@@ -10,7 +16,8 @@ class FingerprintScreen extends StatefulWidget {
 }
 
 class _FingerprintScreenState extends State<FingerprintScreen> {
-  TextEditingController nameController=TextEditingController();
+  Routes routeController = Get.put(Routes());
+  TextEditingController pwdController=TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,10 +53,24 @@ class _FingerprintScreenState extends State<FingerprintScreen> {
                   child: Center(
                       child: CommonTextfield(
                         type: "pwd",
-                    Text: "Enter your password", inputcontroller: nameController,
+                    Text: "Enter your password", inputcontroller: pwdController,
                     //inputcontroller: nameController,
                   )),
                 ),
+              Padding(
+              padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height * 0.07),
+              child: Center(
+                  child: CustomButton(
+                      callback: () async{
+                        Navigator.push(context, MaterialPageRoute(
+                          builder: (context) {
+                            return FillName(pwd: pwdController.text,);
+                          },
+                        ));
+                      },
+                      text: ConstantString.str6)),
+            )
               
              
             ]),

@@ -1,11 +1,16 @@
 import 'package:assign_task/constants/ConstantStrings.dart';
 import 'package:assign_task/utils/Common_widgets.dart';
+import 'package:assign_task/utils/client.dart';
 import 'package:assign_task/views/face_screen.dart';
 import 'package:assign_task/views/fill_password.dart';
+import 'package:assign_task/views/login_face_screen.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
 import 'dart:ui' as ui;
+
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_instance/get_instance.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,6 +20,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+   Routes routeController=Get.put(Routes());
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -86,6 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Center(
                     child: CustomButton(
                         callback: () async{
+                          // routeController.sendPostRequest();
                           late List<CameraDescription> _cameras;
                           _cameras = await availableCameras();
                           Navigator.push(context, MaterialPageRoute(
@@ -102,8 +109,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 margin: const EdgeInsets.only(top: 20.0),
                 child: Center(
                     child: CustomButton(
-                        callback: () {
-                          print("Button Clicked");
+                        callback: () async{
+                          late List<CameraDescription> _cameras;
+                          _cameras = await availableCameras();
+                          Navigator.push(context, MaterialPageRoute(
+                            builder: (context) {
+                              return LoginFaceScreen(cameras: _cameras,);
+                            },
+                          ));
                         },
                         text: ConstantString.str6)))
           ],
